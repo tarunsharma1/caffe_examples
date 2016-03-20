@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+import caffe
+import numpy as np 
+import matplotlib as plt
+from caffe import layers as L, params as P
+
+
+caffe.set_mode_cpu()
+solver = None
+solver = caffe.SGDSolver('my_code/my_feedforward_auto_solver.prototxt')
+
+print [(k, v.data.shape) for k, v in solver.net.blobs.items()]
+
+for i in range(5000):
+	#500 iterations
+	solver.step(1)
+	#training
+	if(i%100==0):
+		#check for test error every 100 iterations
+		count = 0
+		for k in range(100):
+			#100 batches
+			solver.test_nets[0].forward()
+			#forward pass for one batch
+			count+= sum(solver.test_nets[0].blobs['score'].data.argmax(1) == solver.test_nets[0].blobs['label'].data)
+		print '-------------Number of correct cases:'+str(count)+'----------------'	
+
