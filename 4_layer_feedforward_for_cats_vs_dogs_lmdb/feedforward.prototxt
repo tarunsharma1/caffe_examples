@@ -1,0 +1,71 @@
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    scale: 0.00392156862745
+  }
+  data_param {
+    source: "my_code/cats_vs_dogs/mydata_train_32_32_lmdb"
+    batch_size: 100
+    backend: LMDB
+  }
+}
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    scale: 0.00392156862745
+  }
+  data_param {
+    source: "my_code/cats_vs_dogs/mydata_val_32_32_lmdb"
+    batch_size: 100
+    backend: LMDB
+  }
+}
+layer {
+  name: "fc1"
+  type: "InnerProduct"
+  bottom: "data"
+  top: "fc1"
+  inner_product_param {
+    num_output: 500
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "sig1"
+  type: "Sigmoid"
+  bottom: "fc1"
+  top: "fc1"
+}
+layer {
+  name: "score"
+  type: "InnerProduct"
+  bottom: "fc1"
+  top: "score"
+  inner_product_param {
+    num_output: 2
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "score"
+  bottom: "label"
+  top: "loss"
+}

@@ -1,0 +1,5 @@
+creating lmdbs with grayscale
+creating train.txt and val.txt
+creating 4 layer feedforward net with sigmoid
+creating solver
+python file for loading solver and testing
