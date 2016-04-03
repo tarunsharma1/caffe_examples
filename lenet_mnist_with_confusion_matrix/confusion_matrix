@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+import caffe
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn import svm, datasets
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import confusion_matrix
+
+
+net = caffe.Net('./my_code/mnist/lenet_train_test.prototxt','./my_code/mnist/lenet_iter_7638.caffemodel',caffe.TEST)
+
+predicted = []
+true_labels = []
+
+# test data size was 10,000 and batch size was 100 therefore 100 iterations
+for i in range(0,100):
+	net.forward()
+	for k in range(0,100):
+		true_labels.append(list(net.blobs['label'].data)[k])
+		a=list(net.blobs['ip2'].data[k])
+		#argmax
+		predicted.append(a.index(max(a)))
+	
+
+# Compute confusion matrix
+cm = confusion_matrix(true_labels, predicted)
+#digits of precision
+np.set_printoptions(precision=2)
+#print('Confusion matrix, without normalization')
+#print(cm)
+
+
+cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+print('Normalized confusion matrix')
+print(cm_normalized)
+
+#plot it
+
+plt.matshow(cm_normalized)
+plt.title('confusion matrix')
+
+plt.colorbar()
+# 10 classes
+tick_marks = np.arange(10)
+# labels
+plt.xticks(tick_marks, ['0','1','2','3','4','5','6','7','8','9'], rotation=0)
+plt.yticks(tick_marks, ['0','1','2','3','4','5','6','7','8','9'])
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
+plt.show()
